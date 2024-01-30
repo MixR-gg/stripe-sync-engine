@@ -13,12 +13,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Login DigitalOcean Container Registry
+      - name: Login to github container registry
         env:
-          DIGITALOCEAN_REGISTRY_USERNAME: ${{secrets.DIGITALOCEAN_REGISTRY_USERNAME}}
-          DIGITALOCEAN_REGISTRY_PASSWORD: ${{secrets.DIGITALOCEAN_REGISTRY_PASSWORD}}
-        run: docker login registry.digitalocean.com -u $DIGITALOCEAN_REGISTRY_USERNAME -p $DIGITALOCEAN_REGISTRY_PASSWORD
+          CR_PAT: ${{secrets.GITHUB_TOKEN}}
+        run: echo $CR_PAT | docker login ghcr.io -u MixR-gg --password-stdin
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag registry.digitalocean.com/mixr-backend/stripe-sync-engine
+        run: docker build . --file Dockerfile --tag ghcr.io/mixr-gg/stripe-sync-engine
       - name: Push to Container Registry
-        run: docker push registry.digitalocean.com/mixr-backend/stripe-sync-engine:latest
+        run: docker push ghcr.io/mixr-gg/stripe-sync-engine:latest
