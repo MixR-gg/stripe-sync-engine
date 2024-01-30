@@ -1,0 +1,23 @@
+name: CI Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login DigitalOcean Container Registry
+        env:
+          DIGITALOCEAN_REGISTRY_USERNAME: ${{secrets.DIGITALOCEAN_REGISTRY_USERNAME}}
+          DIGITALOCEAN_REGISTRY_PASSWORD: ${{secrets.DIGITALOCEAN_REGISTRY_PASSWORD}}
+        run: docker login registry.digitalocean.com -u $DIGITALOCEAN_REGISTRY_USERNAME -p $DIGITALOCEAN_REGISTRY_PASSWORD
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag registry.digitalocean.com/mixr-backend/stripe-sync-engine
+      - name: Push to Container Registry
+        run: docker push registry.digitalocean.com/mixr-backend/stripe-sync-engine:latest
